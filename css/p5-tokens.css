@@ -1,0 +1,268 @@
+/* ==========================================================================
+   PHANTOM PORTFOLIO — Design Tokens & Core Utilities
+   Gaya: menu bergaya Persona 5 (merah / hitam / putih, miring, bergerigi,
+   huruf "ransom note"). Semua bentuk di sini orisinal.
+   Fonts (Google Fonts) — tambahkan di <head>:
+   https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Bowlby+One+SC&family=Rubik+Mono+One&family=Special+Elite&family=Abril+Fatface&family=Barlow+Condensed:ital,wght@0,600;0,800;1,800;1,900&family=Barlow:wght@500;600;700&display=swap
+   ========================================================================== */
+
+:root {
+  /* ---- Palet ---- */
+  --p5-red: #e5001c;          /* merah utama: highlight, seleksi */
+  --p5-red-hot: #ff1e3c;      /* hover / kilat */
+  --p5-red-deep: #5c0008;     /* latar merah gelap */
+  --p5-red-blood: #8f0010;    /* bayangan merah */
+  --p5-black: #0b0b0c;        /* hitam panel */
+  --p5-ink: #161617;          /* hitam sekunder */
+  --p5-white: #f4f4f2;        /* putih kertas */
+  --p5-grey: #c8c8c6;         /* abu siluet */
+  --p5-grey-dark: #6a6a69;    /* teks non-aktif */
+  --p5-cyan: #22e3ee;         /* aksen kursor / glitch */
+  --p5-mint: #e2f8e4;         /* baris terpilih (pucat) */
+  --p5-hp: #3fe2c2;           /* bar "HP" */
+  --p5-sp: #f35fcd;           /* bar "SP" */
+  --p5-gold: #f6b400;         /* bintang stat / rank */
+
+  /* ---- Tipografi ---- */
+  --font-display: "Anton", "Impact", "Arial Narrow Bold", sans-serif;
+  --font-heavy: "Archivo Black", "Arial Black", sans-serif;
+  --font-ui: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --font-body: "Barlow", "Segoe UI", system-ui, sans-serif;
+  --font-type: "Special Elite", "Courier New", monospace;
+  /* Kumpulan font untuk huruf ransom */
+  --ransom-1: "Anton", Impact, sans-serif;
+  --ransom-2: "Archivo Black", "Arial Black", sans-serif;
+  --ransom-3: "Bowlby One SC", "Arial Black", sans-serif;
+  --ransom-4: "Rubik Mono One", "Arial Black", sans-serif;
+  --ransom-5: "Abril Fatface", Georgia, serif;
+  --ransom-6: "Special Elite", "Courier New", monospace;
+
+  /* ---- Skala ---- */
+  --step--1: clamp(0.8rem, 0.75rem + 0.2vw, 0.9rem);
+  --step-0: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --step-1: clamp(1.3rem, 1.15rem + 0.6vw, 1.6rem);
+  --step-2: clamp(1.7rem, 1.4rem + 1.3vw, 2.4rem);
+  --step-3: clamp(2.4rem, 1.8rem + 2.8vw, 4rem);
+  --step-4: clamp(3.2rem, 2.2rem + 5vw, 6.5rem);
+
+  --skew: -12deg;              /* kemiringan khas menu */
+  --tilt: -4deg;               /* rotasi elemen */
+  --ease-snap: cubic-bezier(0.2, 1.4, 0.35, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  color-scheme: dark;
+}
+
+/* ==========================================================================
+   Latar
+   ========================================================================== */
+.p5-bg-red {
+  background:
+    radial-gradient(ellipse at 70% 40%, rgba(255, 30, 60, 0.18), transparent 60%),
+    var(--p5-red-deep);
+}
+.p5-halftone {
+  background-image: radial-gradient(circle, currentColor 32%, transparent 34%);
+  background-size: 14px 14px;
+}
+.p5-halftone-fade {
+  -webkit-mask-image: linear-gradient(135deg, #000 10%, transparent 75%);
+  mask-image: linear-gradient(135deg, #000 10%, transparent 75%);
+}
+.p5-stripes {
+  background: repeating-linear-gradient(
+    -55deg, var(--p5-black) 0 14px, var(--p5-white) 14px 22px);
+}
+
+/* ==========================================================================
+   Panel bergerigi (clip-path)
+   ========================================================================== */
+.p5-panel {
+  position: relative;
+  background: var(--p5-black);
+  color: var(--p5-white);
+  padding: 1.6rem 2rem;
+  clip-path: polygon(0% 6%, 7% 0%, 46% 4%, 100% 0%, 97% 52%, 100% 100%, 58% 95%, 3% 100%, 5% 48%);
+}
+.p5-panel--white {
+  background: var(--p5-white);
+  color: var(--p5-black);
+  clip-path: polygon(2% 0%, 100% 8%, 96% 100%, 0% 92%);
+}
+.p5-panel--red {
+  background: var(--p5-red);
+  color: var(--p5-white);
+  clip-path: polygon(0% 12%, 100% 0%, 97% 88%, 4% 100%);
+}
+/* Panel berlapis: bayangan putih di belakang panel hitam */
+.p5-panel-stack { position: relative; isolation: isolate; }
+.p5-panel-stack::before {
+  content: ""; position: absolute; inset: -8px -10px -10px -6px; z-index: -1;
+  background: var(--p5-white);
+  clip-path: polygon(1% 4%, 9% 0%, 48% 2%, 100% 0%, 98% 55%, 100% 100%, 55% 97%, 0% 100%, 3% 50%);
+}
+
+/* ==========================================================================
+   Item menu miring (seperti menu utama)
+   ========================================================================== */
+.p5-menu { display: flex; flex-direction: column; gap: 0.15rem; list-style: none; padding: 0; margin: 0; }
+.p5-menu__item {
+  position: relative; display: inline-block; width: max-content;
+  font-family: var(--font-display); font-size: var(--step-2);
+  text-transform: uppercase; letter-spacing: 0.02em; line-height: 1;
+  color: var(--p5-white); text-decoration: none; padding: 0.15em 0.5em;
+  transform: rotate(var(--tilt)); transition: transform 0.25s var(--ease-snap), color 0.15s;
+  -webkit-text-stroke: 1px var(--p5-black); paint-order: stroke fill;
+}
+.p5-menu__item::before {
+  content: ""; position: absolute; inset: -0.05em -0.3em; z-index: -1;
+  background: var(--p5-red); transform: scaleX(0) skewX(var(--skew));
+  transform-origin: left; transition: transform 0.22s var(--ease-out);
+  clip-path: polygon(0 20%, 100% 0, 96% 100%, 3% 85%);
+}
+.p5-menu__item::after { /* bayangan cyan glitch */
+  content: ""; position: absolute; inset: -0.05em -0.3em; z-index: -2;
+  background: var(--p5-cyan); transform: translate(6px, -4px) scaleX(0) skewX(var(--skew));
+  transform-origin: left; transition: transform 0.28s var(--ease-out) 0.03s;
+  clip-path: polygon(0 20%, 100% 0, 96% 100%, 3% 85%);
+}
+.p5-menu__item:hover, .p5-menu__item:focus-visible, .p5-menu__item.is-active {
+  transform: rotate(calc(var(--tilt) - 2deg)) scale(1.12) translateX(0.3em);
+  outline: none;
+}
+
+/* Sorotan generik dengan efek yang sama dengan menu (.p5-hl) */
+.p5-hl { position: relative; isolation: isolate; }
+.p5-hl::before, .p5-hl::after {
+  content: ""; position: absolute; inset: -0.1em -0.35em; pointer-events: none;
+  transform-origin: left; clip-path: polygon(0 20%, 100% 0, 96% 100%, 3% 85%);
+}
+.p5-hl::before { z-index: -1; background: var(--p5-red); transform: scaleX(0) skewX(var(--skew)); transition: transform 0.22s var(--ease-out); }
+.p5-hl::after { z-index: -2; background: var(--p5-cyan); transform: translate(6px, -4px) scaleX(0) skewX(var(--skew)); transition: transform 0.28s var(--ease-out) 0.03s; }
+.p5-hl:hover::before, .p5-hl:focus-visible::before, .p5-hl.is-active::before { transform: scaleX(1) skewX(var(--skew)); }
+.p5-hl:hover::after, .p5-hl:focus-visible::after, .p5-hl.is-active::after { transform: translate(6px, -4px) scaleX(1) skewX(var(--skew)); }
+
+/* Getaran acak agresif saat disorot (merah & cyan berbeda tempo) */
+.p5-menu__item:hover::before, .p5-menu__item:focus-visible::before, .p5-menu__item.is-active::before,
+.p5-hl:hover::before, .p5-hl:focus-visible::before, .p5-hl.is-active::before {
+  animation: p5-jit-red 1.6s steps(1, end) infinite;
+}
+.p5-menu__item:hover::after, .p5-menu__item:focus-visible::after, .p5-menu__item.is-active::after,
+.p5-hl:hover::after, .p5-hl:focus-visible::after, .p5-hl.is-active::after {
+  animation: p5-jit-cyan 1.2s steps(1, end) infinite;
+}
+@keyframes p5-jit-red {
+  0%   { transform: translate(0, 0) skewX(-12deg) rotate(-1deg) scaleX(1);        clip-path: polygon(0 20%, 100% 0, 96% 100%, 3% 85%); }
+  14%  { transform: translate(-6px, 3px) skewX(-22deg) rotate(2deg) scaleX(1.08);  clip-path: polygon(3% 0, 100% 22%, 93% 90%, 0 100%); }
+  29%  { transform: translate(5px, -4px) skewX(-4deg) rotate(-3deg) scaleX(0.94);  clip-path: polygon(0 6%, 95% 0, 100% 78%, 7% 100%); }
+  43%  { transform: translate(-3px, -2px) skewX(-16deg) rotate(1deg) scaleX(1.12); clip-path: polygon(6% 30%, 100% 4%, 90% 100%, 0 72%); }
+  57%  { transform: translate(7px, 4px) skewX(-26deg) rotate(-2deg) scaleX(0.98);  clip-path: polygon(0 0, 88% 14%, 100% 100%, 4% 88%); }
+  71%  { transform: translate(-8px, 1px) skewX(-9deg) rotate(3deg) scaleX(1.04);   clip-path: polygon(2% 16%, 100% 0, 97% 86%, 0 100%); }
+  86%  { transform: translate(2px, -5px) skewX(-18deg) rotate(-4deg) scaleX(1.1);  clip-path: polygon(0 10%, 92% 26%, 100% 92%, 9% 80%); }
+}
+@keyframes p5-jit-cyan {
+  0%   { transform: translate(8px, -6px) skewX(-14deg) rotate(2deg) scaleX(1);     clip-path: polygon(0 20%, 100% 0, 96% 100%, 3% 85%); }
+  17%  { transform: translate(-7px, 6px) skewX(-24deg) rotate(-2deg) scaleX(1.1);  clip-path: polygon(5% 0, 100% 30%, 90% 100%, 0 80%); }
+  33%  { transform: translate(12px, 2px) skewX(-6deg) rotate(4deg) scaleX(0.92);   clip-path: polygon(0 12%, 100% 0, 100% 70%, 12% 100%); }
+  50%  { transform: translate(-4px, -8px) skewX(-20deg) rotate(-3deg) scaleX(1.15); clip-path: polygon(0 40%, 94% 0, 100% 100%, 6% 92%); }
+  67%  { transform: translate(10px, 7px) skewX(-10deg) rotate(1deg) scaleX(1.02);   clip-path: polygon(8% 0, 100% 10%, 92% 88%, 0 100%); }
+  83%  { transform: translate(-10px, -3px) skewX(-28deg) rotate(3deg) scaleX(1.06); clip-path: polygon(0 0, 100% 24%, 96% 100%, 4% 76%); }
+}
+.p5-menu__item:hover::before, .p5-menu__item:focus-visible::before, .p5-menu__item.is-active::before { transform: scaleX(1) skewX(var(--skew)); }
+.p5-menu__item:hover::after, .p5-menu__item:focus-visible::after, .p5-menu__item.is-active::after { transform: translate(6px, -4px) scaleX(1) skewX(var(--skew)); }
+
+/* ==========================================================================
+   Huruf ransom (dibuat oleh js/ransom.js)
+   ========================================================================== */
+.ransom { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0.04em; line-height: 1; }
+.ransom__ch {
+  display: inline-block; padding: 0.06em 0.1em; font-size: 1em;
+  transform: rotate(var(--r, 0deg)) translateY(var(--y, 0)) scale(var(--s, 1));
+}
+.ransom__word { display: inline-flex; align-items: center; gap: 0.04em; white-space: nowrap; }
+.ransom__space { display: inline-block; width: 0.35em; }
+.ransom__ch.v-ink   { background: var(--p5-black); color: var(--p5-white); }
+.ransom__ch.v-paper { background: var(--p5-white); color: var(--p5-black); }
+.ransom__ch.v-red   { background: var(--p5-red);   color: var(--p5-white); }
+.ransom__ch.v-bare  { background: none; color: var(--p5-white); -webkit-text-stroke: 0.06em var(--p5-black); paint-order: stroke fill; }
+.ransom__ch.v-cut   { background: var(--p5-white); color: var(--p5-red); clip-path: polygon(6% 0, 100% 8%, 94% 100%, 0 92%); }
+.ransom--on-light .ransom__ch.v-bare { color: var(--p5-black); -webkit-text-stroke: 0; }
+/* Di atas latar merah: hindari huruf merah & huruf tanpa latar */
+.ransom--on-red .ransom__ch.v-red  { background: var(--p5-black); color: var(--p5-white); }
+.ransom--on-red .ransom__ch.v-bare { background: var(--p5-white); color: var(--p5-black); -webkit-text-stroke: 0; }
+
+/* ==========================================================================
+   Label & teks UI
+   ========================================================================== */
+.p5-label {
+  font-family: var(--font-ui); font-weight: 800; font-style: italic;
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.p5-tag {
+  display: inline-block; font-family: var(--font-display); text-transform: uppercase;
+  background: var(--p5-white); color: var(--p5-black); padding: 0.15em 0.6em;
+  transform: rotate(var(--tilt)) skewX(var(--skew)); box-shadow: 4px 4px 0 var(--p5-black);
+}
+.p5-stamp { /* "DONE!" */
+  font-family: var(--font-display); font-style: italic; font-size: var(--step-2);
+  color: var(--p5-red-blood); transform: skewX(var(--skew)) rotate(-6deg);
+  letter-spacing: -0.02em; display: inline-block;
+}
+
+/* Bar statistik ala HP/SP */
+.p5-bar { display: grid; grid-template-columns: auto 1fr; align-items: end; gap: 0.4rem; }
+.p5-bar__label { font-family: var(--font-ui); font-weight: 900; font-style: italic; font-size: var(--step--1); }
+.p5-bar__track { height: 6px; background: rgba(255,255,255,0.12); transform: skewX(var(--skew)); }
+.p5-bar__fill { height: 100%; width: var(--v, 50%); background: var(--c, var(--p5-hp)); transition: width 0.8s var(--ease-out); }
+
+/* Tombol dengan petunjuk tombol keyboard */
+.p5-btn {
+  display: inline-flex; align-items: center; gap: 0.4em; cursor: pointer;
+  font-family: var(--font-heavy); font-size: var(--step-0); text-transform: none;
+  background: var(--p5-white); color: var(--p5-black); border: 3px solid var(--p5-black);
+  padding: 0.25em 0.7em 0.25em 0.3em; border-radius: 0.6em 0.3em 0.7em 0.2em;
+  box-shadow: 0 0 0 2px var(--p5-white); transform: rotate(-3deg);
+  transition: transform 0.2s var(--ease-snap);
+}
+.p5-btn:hover, .p5-btn:focus-visible { transform: rotate(-3deg) scale(1.08); outline: none; }
+.p5-btn__key {
+  display: grid; place-items: center; min-width: 1.6em; height: 1.6em; padding: 0 0.3em;
+  border-radius: 999px; font-family: var(--font-ui); font-weight: 800; font-size: 0.8em;
+  background: var(--k, var(--p5-red)); color: var(--p5-white); border: 2px solid var(--p5-black);
+}
+
+/* Badge RANK MAX */
+.p5-rank { display: inline-flex; align-items: flex-end; gap: 0.1em; transform: rotate(-8deg); }
+.p5-rank__word { font-family: var(--font-display); font-style: italic; font-size: 0.55em; line-height: 1; }
+.p5-rank__num { font-family: var(--font-display); font-size: 1.6em; line-height: 0.8; }
+.p5-rank__max {
+  font-family: var(--font-display); font-size: 0.8em; background: var(--p5-white); color: var(--p5-black);
+  padding: 0 0.15em; transform: skewX(var(--skew)); margin-left: -0.4em; box-shadow: 3px 3px 0 var(--p5-black);
+}
+
+/* ==========================================================================
+   Animasi
+   ========================================================================== */
+@keyframes p5-slam {
+  0% { transform: translateX(-30%) skewX(-30deg) scale(1.3); }
+  60% { transform: translateX(3%) skewX(-8deg) scale(1); }
+  100% { transform: none; }
+}
+@keyframes p5-wobble {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(2deg) scale(1.03); }
+}
+@keyframes p5-spin-slow { to { transform: rotate(360deg); } }
+@keyframes p5-flash {
+  0%, 100% { opacity: 0; }
+  10% { opacity: 1; }
+}
+.anim-slam { animation: p5-slam 0.55s var(--ease-out) both; }
+.anim-wobble { animation: p5-wobble 2.4s ease-in-out infinite; }
+.anim-spin { animation: p5-spin-slow 40s linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .anim-slam, .anim-wobble, .anim-spin { animation: none; }
+  .p5-menu__item::before, .p5-menu__item::after, .p5-hl::before, .p5-hl::after { animation: none !important; }
+  .p5-menu__item, .p5-menu__item::before, .p5-menu__item::after, .p5-btn { transition: none; }
+}

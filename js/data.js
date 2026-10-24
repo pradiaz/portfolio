@@ -37,17 +37,19 @@ window.PORTFOLIO = {
       note: "Reactive UI for dashboards and admin screens." }
   ],
 
-  /* Tools di layar Equip. slot = kelompok (bebas, contoh "Data", "Server", "Workflow").
+  /* Tools di layar Equip. slot = kategori di kiri (bebas, contoh "Data", "Server", "Workflow");
+     kind = label strip putih di atas nama tool (gunakan ★ sebagai pemisah).
      icon tambahan: database, server, cache, branch, send */
   tools: [
-    { slot: "Data",     name: "MySQL",      icon: "database", note: "Open-source relational database." },
-    { slot: "Data",     name: "SQL Server", icon: "database", note: "Microsoft's relational database." },
-    { slot: "Data",     name: "Redis",      icon: "cache",    note: "In-memory data store for caching and queues." },
-    { slot: "Server",   name: "IIS",        icon: "server",   note: "Microsoft's web server for Windows hosts." },
-    { slot: "Server",   name: "Apache",     icon: "server",   note: "Open-source HTTP server." },
-    { slot: "Server",   name: "nginx",      icon: "server",   note: "Web server and reverse proxy." },
-    { slot: "Workflow", name: "Git",        icon: "branch",   note: "Distributed version control." },
-    { slot: "Workflow", name: "Postman",    icon: "send",     note: "Platform for building and testing APIs." }
+    { slot: "Data",     name: "MySQL",      kind: "Database", icon: "database", note: "Open-source relational database." },
+    { slot: "Data",     name: "PostgreSQL", kind: "Database", icon: "database", note: "Open-source object-relational database." },
+    { slot: "Data",     name: "SQL Server", kind: "Database", icon: "database", note: "Microsoft's relational database." },
+    { slot: "Data",     name: "Redis",      kind: "Cache ★ Queue", icon: "cache",    note: "In-memory data store for caching and queues." },
+    { slot: "Server",   name: "IIS",        kind: "Web server", icon: "server",   note: "Microsoft's web server for Windows hosts." },
+    { slot: "Server",   name: "Apache",     kind: "Web server", icon: "server",   note: "Open-source HTTP server." },
+    { slot: "Server",   name: "nginx",      kind: "Reverse proxy", icon: "server",   note: "Web server and reverse proxy." },
+    { slot: "Workflow", name: "Git",        kind: "Version control", icon: "branch",   note: "Distributed version control." },
+    { slot: "Workflow", name: "Postman",    kind: "API client", icon: "send",     note: "Platform for building and testing APIs." }
   ],
 
   /* stack: isi dengan nama skill di atas agar muncul di "Used in" pada layar Skills.

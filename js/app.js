@@ -36,7 +36,7 @@
   const TITLES = { home: "Main", about: "Stats", skills: "Skill", equip: "Equip", projects: "Request", experience: "Calendar", contact: "Contact" };
   const ROUTES = ["home"].concat(MENU.map((m) => m.id));
 
-  const state = { home: 0, skills: 0, equip: 0, projects: 0, experience: 0, contact: 0 };
+  const state = { home: 0, skills: 0, equip: 0, equipCat: 0, projects: 0, experience: 0, contact: 0 };
   const $screen = document.getElementById("screen");
   const $hud = document.getElementById("hud-name");
   const $keys = document.getElementById("keys");
@@ -326,60 +326,73 @@
   }
 
   /* ==========================================================
-     EQUIP — tools & software sebagai slot perlengkapan
+     EQUIP — kategori di kiri, kartu tool di kanan
      ========================================================== */
   function equipGroups() {
     const groups = [];
     (D.tools || []).forEach((t, i) => {
-      let g = groups.find((x) => x.slot === t.slot);
+      let g = groups.find((x) => x.slot === (t.slot || "Gear"));
       if (!g) groups.push((g = { slot: t.slot || "Gear", items: [] }));
       g.items.push(i);
     });
     return groups;
   }
-  function equipDetail(t) {
-    const same = D.tools.filter((x) => x.slot === t.slot && x !== t).map((x) => x.name);
-    return `
-      <img class="eq-detail__icon" src="${icon(t.icon)}" alt="">
-      <span class="eq-detail__slot">${esc(t.slot)}</span>
-      <h2 class="eq-detail__name" data-ransom="red" data-seed="3">${esc(t.name)}</h2>
-      ${has(t.note) ? `<p class="eq-detail__note">${esc(t.note)}</p>` : ""}
-      ${same.length ? `<dl class="eq-detail__meta"><dt>Same slot</dt><dd>${same.map(esc).join(", ")}</dd></dl>` : ""}`;
+  function equipCards(g, sel) {
+    return g.items.map((i, k) => {
+      const t = D.tools[i];
+      const parts = String(t.kind || t.slot).split("★").map((x) => x.trim());
+      return `<li><button type="button" class="eqc${k === sel ? " is-sel" : ""}" data-k="${k}" style="--k:${k}" aria-pressed="${k === sel}">
+        <span class="eqc__kind">${parts.map(esc).join(' <i aria-hidden="true">★</i> ')}</span>
+        <span class="eqc__name"><img src="${icon(t.icon)}" alt="">${esc(t.name)}</span>
+      </button></li>`;
+    }).join("");
   }
   function equipView() {
     const groups = equipGroups();
     return `
-    <section class="eq">
-      <div class="eq-left">
-        <h1 class="screen-title eq-title" data-ransom data-seed="4">Equip</h1>
-        <div class="eq-groups">
-          ${groups.map((g) => `<div class="eq-group">
-            <span class="eq-slot">${esc(g.slot)}</span>
-            <ul class="eq-list" role="listbox" aria-label="${esc(g.slot)}">
-              ${g.items.map((i) => { const t = D.tools[i]; return `<li><button class="row eq-item" role="option" data-idx="${i}">
-                <img src="${icon(t.icon)}" alt="">
-                <span class="eq-item__name">${esc(t.name)}</span>
-                <span class="eq-item__e" aria-hidden="true">E</span>
-              </button></li>`; }).join("")}
-            </ul>
-          </div>`).join("")}
-        </div>
+    <section class="eqx">
+      <ul class="eqx-cats" aria-label="Tool categories">
+        ${groups.map((g, i) => `<li style="--i:${i}"><button type="button" class="eqx-cat" data-g="${i}">
+          <span>${esc(g.slot)}</span><small>${pad2(g.items.length)}</small>
+        </button></li>`).join("")}
+      </ul>
+      <div class="eqx-right">
+        <ul class="eqx-cards" id="eqx-cards" aria-label="Tools"></ul>
+        <p class="eqx-note" id="eqx-note" aria-live="polite"></p>
       </div>
-      <div class="eq-right">
-        <article class="eq-detail" id="eq-detail" aria-live="polite"></article>
-        <div class="eq-loadout">
-          <span class="eq-loadout__k">Loadout</span>
-          <dl>${groups.map((g) => `<dt>${esc(g.slot)}</dt><dd>${pad2(g.items.length)}</dd>`).join("")}</dl>
-          <p class="eq-loadout__total"><b>${pad2((D.tools || []).length)}</b><span>Tools<br>equipped</span></p>
-        </div>
-      </div>
+      <div class="eqx-word" aria-hidden="true">${[..."EQUIP"].map((c, i) => `<span class="${i % 2 ? "w" : "b"}" style="--r:${[-6, 5, -3, 7, -4][i]}deg;--s:${[1, 0.84, 1.08, 0.9, 1.02][i]}">${c}</span>`).join("")}</div>
+      <p class="eqx-prompt">Which tool will you inspect?</p>
     </section>`;
   }
   function equipMount() {
-    return listMount("equip", D.tools || [], (t) => {
-      const d = document.getElementById("eq-detail");
-      d.innerHTML = equipDetail(t); Ransom.apply(d);
+    const groups = equipGroups();
+    if (!groups.length) return {};
+    const cats = [...$screen.querySelectorAll(".eqx-cat")];
+    const $cards = document.getElementById("eqx-cards");
+    const $note = document.getElementById("eqx-note");
+    let g = Math.min(state.equipCat || 0, groups.length - 1);
+    let k = 0;
+    function paint() {
+      cats.forEach((c, i) => { const on = i === g; c.classList.toggle("is-sel", on); c.setAttribute("aria-pressed", on); });
+      $cards.innerHTML = equipCards(groups[g], k);
+      const t = D.tools[groups[g].items[k]];
+      $note.textContent = t.note || "";
+      $cards.querySelectorAll(".eqc").forEach((b) => {
+        const pick = () => { if (k !== Number(b.dataset.k)) { k = Number(b.dataset.k); paint(); } };
+        b.addEventListener("click", pick);
+        b.addEventListener("mouseenter", () => window.matchMedia("(hover: hover)").matches && pick());
+      });
+    }
+    function setCat(i) { g = (i + groups.length) % groups.length; state.equipCat = g; k = 0; paint(); }
+    cats.forEach((c, i) => {
+      c.addEventListener("click", () => setCat(i));
+      c.addEventListener("mouseenter", () => window.matchMedia("(hover: hover)").matches && g !== i && setCat(i));
     });
+    paint();
+    return {
+      move: (d) => { const n = groups[g].items.length; k = (k + d + n) % n; paint(); $cards.querySelector(".eqc.is-sel").focus({ preventScroll: true }); },
+      sideMove: (d) => setCat(g + d)
+    };
   }
 
   /* ==========================================================
@@ -646,14 +659,20 @@
     if (location.hash.slice(1) !== route) { location.hash = route; return; } // hashchange calls show()
     show(route);
   }
+  let pending = null;
   function show(route) {
     if (!VIEWS[route]) route = "home";
-    if (route === current || busy) return;
+    // pindah halaman saat transisi masih berjalan: simpan, jalankan sesudahnya
+    if (busy) { pending = route; return; }
+    if (route === current) return;
     if (current === null || reduceMotion) return render(route);
     busy = true;
     $wipe.classList.remove("is-on"); void $wipe.offsetWidth; $wipe.classList.add("is-on");
     setTimeout(() => render(route), 300);
-    setTimeout(() => { $wipe.classList.remove("is-on"); busy = false; }, 760);
+    setTimeout(() => {
+      $wipe.classList.remove("is-on"); busy = false;
+      if (pending) { const next = pending; pending = null; show(next); }
+    }, 760);
   }
 
   window.addEventListener("hashchange", () => show(location.hash.slice(1) || "home"));

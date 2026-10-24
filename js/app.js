@@ -28,14 +28,15 @@
   const MENU = [
     { id: "about",      label: "About",      hint: "View profile and stats" },
     { id: "skills",     label: "Skills",     hint: "Check skill ranks" },
+    { id: "equip",      label: "Equip",      hint: "Inspect tools in the loadout" },
     { id: "projects",   label: "Projects",   hint: "Review systems built" },
     { id: "experience", label: "Experience", hint: "Open the work calendar" },
     { id: "contact",    label: "Contact",    hint: "Send a calling card" }
   ];
-  const TITLES = { home: "Main", about: "Stats", skills: "Skill", projects: "Request", experience: "Calendar", contact: "Contact" };
+  const TITLES = { home: "Main", about: "Stats", skills: "Skill", equip: "Equip", projects: "Request", experience: "Calendar", contact: "Contact" };
   const ROUTES = ["home"].concat(MENU.map((m) => m.id));
 
-  const state = { home: 0, skills: 0, projects: 0, experience: 0, contact: 0 };
+  const state = { home: 0, skills: 0, equip: 0, projects: 0, experience: 0, contact: 0 };
   const $screen = document.getElementById("screen");
   const $hud = document.getElementById("hud-name");
   const $keys = document.getElementById("keys");
@@ -325,6 +326,63 @@
   }
 
   /* ==========================================================
+     EQUIP — tools & software sebagai slot perlengkapan
+     ========================================================== */
+  function equipGroups() {
+    const groups = [];
+    (D.tools || []).forEach((t, i) => {
+      let g = groups.find((x) => x.slot === t.slot);
+      if (!g) groups.push((g = { slot: t.slot || "Gear", items: [] }));
+      g.items.push(i);
+    });
+    return groups;
+  }
+  function equipDetail(t) {
+    const same = D.tools.filter((x) => x.slot === t.slot && x !== t).map((x) => x.name);
+    return `
+      <img class="eq-detail__icon" src="${icon(t.icon)}" alt="">
+      <span class="eq-detail__slot">${esc(t.slot)}</span>
+      <h2 class="eq-detail__name" data-ransom="red" data-seed="3">${esc(t.name)}</h2>
+      ${has(t.note) ? `<p class="eq-detail__note">${esc(t.note)}</p>` : ""}
+      ${same.length ? `<dl class="eq-detail__meta"><dt>Same slot</dt><dd>${same.map(esc).join(", ")}</dd></dl>` : ""}`;
+  }
+  function equipView() {
+    const groups = equipGroups();
+    return `
+    <section class="eq">
+      <div class="eq-left">
+        <h1 class="screen-title eq-title" data-ransom data-seed="4">Equip</h1>
+        <div class="eq-groups">
+          ${groups.map((g) => `<div class="eq-group">
+            <span class="eq-slot">${esc(g.slot)}</span>
+            <ul class="eq-list" role="listbox" aria-label="${esc(g.slot)}">
+              ${g.items.map((i) => { const t = D.tools[i]; return `<li><button class="row eq-item" role="option" data-idx="${i}">
+                <img src="${icon(t.icon)}" alt="">
+                <span class="eq-item__name">${esc(t.name)}</span>
+                <span class="eq-item__e" aria-hidden="true">E</span>
+              </button></li>`; }).join("")}
+            </ul>
+          </div>`).join("")}
+        </div>
+      </div>
+      <div class="eq-right">
+        <article class="eq-detail" id="eq-detail" aria-live="polite"></article>
+        <div class="eq-loadout">
+          <span class="eq-loadout__k">Loadout</span>
+          <dl>${groups.map((g) => `<dt>${esc(g.slot)}</dt><dd>${pad2(g.items.length)}</dd>`).join("")}</dl>
+          <p class="eq-loadout__total"><b>${pad2((D.tools || []).length)}</b><span>Tools<br>equipped</span></p>
+        </div>
+      </div>
+    </section>`;
+  }
+  function equipMount() {
+    return listMount("equip", D.tools || [], (t) => {
+      const d = document.getElementById("eq-detail");
+      d.innerHTML = equipDetail(t); Ransom.apply(d);
+    });
+  }
+
+  /* ==========================================================
      PROJECTS
      ========================================================== */
   function projectDetail(p) {
@@ -557,7 +615,7 @@
      ========================================================== */
   const VIEWS = {
     home: [homeView, homeMount], about: [aboutView, aboutMount], skills: [skillsView, skillsMount],
-    projects: [projectsView, projectsMount], experience: [experienceView, experienceMount], contact: [contactView, contactMount]
+    equip: [equipView, equipMount], projects: [projectsView, projectsMount], experience: [experienceView, experienceMount], contact: [contactView, contactMount]
   };
   let ctrl = {};
 
